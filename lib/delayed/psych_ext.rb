@@ -3,7 +3,7 @@ module Delayed
     # serialize to YAML
     def encode_with(coder)
       coder.map = {
-        'object' => object,
+        'object' => serializable_object,
         'method_name' => method_name,
         'args' => args
       }

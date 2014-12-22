@@ -26,6 +26,34 @@ module Delayed
       end
     end
 
+    def serializable_object
+      self.object
+    end
+
+    if defined?(GlobalID)
+      GLOBALID_KEY = '_dj_globalid'.freeze
+
+      def object=(newobject)
+        if newobject.respond_to?(:to_global_id)
+          @object = { GLOBALID_KEY => newobject.to_global_id.to_s }
+        else
+          @object = newobject
+        end
+      end
+
+      def object
+        if @object.is_a?(Hash) && @object.size == 1 and @object.include?(GLOBALID_KEY)
+          @gidlocator ||= GlobalID::Locator.locate @object[GLOBALID_KEY]
+        else
+          @object
+        end
+      end
+
+      def serializable_object
+        @object # don't call the function
+      end
+    end
+
     def perform
       object.send(method_name, *args) if object
     end
